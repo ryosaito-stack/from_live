@@ -1,0 +1,15 @@
+export const VoteService = {
+  hasVoted: jest.fn(),
+  submitVote: jest.fn(),
+  getVoteHistory: jest.fn(),
+  getVotesByGroup: jest.fn(),
+  validateAndSaveVote: jest.fn(),
+  getVoteCount: jest.fn(),
+  getTotalScore: jest.fn(),
+  getAllVotes: jest.fn(),
+  getVotesByDateRange: jest.fn(),
+  deleteVote: jest.fn(),
+  deleteAllVotes: jest.fn(),
+  getVoteStatistics: jest.fn(),
+  cleanupInvalidVotes: jest.fn(),
+}
