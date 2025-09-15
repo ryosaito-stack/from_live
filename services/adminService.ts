@@ -210,7 +210,7 @@ export class AdminService {
       const rows = votes.map(vote => {
         const createdAt = vote.createdAt instanceof Date 
           ? vote.createdAt.toISOString() 
-          : new Date(vote.createdAt).toISOString()
+          : vote.createdAt.toDate().toISOString()
         return `${vote.groupId},${vote.groupName},${vote.score},${vote.deviceId},${createdAt}`
       })
 

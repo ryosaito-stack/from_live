@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import { Timestamp } from 'firebase/firestore'
 import { AdminService } from '@/services/adminService'
 import { Vote } from '@/types'
 
@@ -17,10 +18,6 @@ export default function VotesManagement() {
   useEffect(() => {
     loadData()
   }, [])
-
-  useEffect(() => {
-    applyFilters()
-  }, [votes, selectedGroup, startDate, endDate])
 
   const loadData = async () => {
     try {
@@ -39,7 +36,7 @@ export default function VotesManagement() {
     }
   }
 
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     let filtered = [...votes]
 
     // 団体フィルタ
@@ -50,18 +47,37 @@ export default function VotesManagement() {
     // 日付フィルタ
     if (startDate) {
       const start = new Date(startDate)
-      filtered = filtered.filter(vote => new Date(vote.createdAt) >= start)
+      filtered = filtered.filter(vote => {
+        const voteDate = vote.createdAt instanceof Date 
+          ? vote.createdAt 
+          : vote.createdAt.toDate()
+        return voteDate >= start
+      })
     }
     if (endDate) {
       const end = new Date(endDate)
       end.setHours(23, 59, 59, 999)
-      filtered = filtered.filter(vote => new Date(vote.createdAt) <= end)
+      filtered = filtered.filter(vote => {
+        const voteDate = vote.createdAt instanceof Date 
+          ? vote.createdAt 
+          : vote.createdAt.toDate()
+        return voteDate <= end
+      })
     }
 
     setFilteredVotes(filtered)
-  }
+  }, [votes, selectedGroup, startDate, endDate])
+
+  useEffect(() => {
+    applyFilters()
+  }, [applyFilters])
 
   const handleDeleteVote = async (vote: Vote) => {
+    if (!vote.id) {
+      alert('投票IDが見つかりません')
+      return
+    }
+
     if (!confirm(`投票を削除しますか？\n団体: ${vote.groupName}\n点数: ${vote.score}`)) {
       return
     }
@@ -100,8 +116,8 @@ export default function VotesManagement() {
     setEndDate('')
   }
 
-  const formatDate = (date: Date | string) => {
-    const d = new Date(date)
+  const formatDate = (date: Date | Timestamp) => {
+    const d = date instanceof Date ? date : date.toDate()
     return d.toLocaleString('ja-JP', {
       year: 'numeric',
       month: '2-digit',

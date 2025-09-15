@@ -69,7 +69,7 @@ export function ResultsChart({ results, chartType }: ResultsChartProps) {
           cx="50%"
           cy="50%"
           labelLine={false}
-          label={(entry) => `${entry.name}: ${entry.value.toFixed(2)}`}
+          label={(entry) => `${entry.name}: ${Number(entry.value ?? 0).toFixed(2)}`}
           outerRadius={120}
           fill="#8884d8"
           dataKey="value"
